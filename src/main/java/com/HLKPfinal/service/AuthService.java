@@ -1,28 +1,24 @@
 package com.HLKPfinal.service;
 
-import lombok.RequiredArgsConstructor;
-//import com.HLKPfinal.entity.Authority;
-//import com.HLKPfinal.entity.AuthorityEnum;
-import com.HLKPfinal.entity.Member;
-import com.HLKPfinal.entity.RefreshToken;
 import com.HLKPfinal.dto.MemberRequestDto;
 import com.HLKPfinal.dto.MemberResponseDto;
 import com.HLKPfinal.dto.TokenDto;
 import com.HLKPfinal.dto.TokenRequestDto;
+import com.HLKPfinal.entity.Member;
+import com.HLKPfinal.entity.RefreshToken;
+import com.HLKPfinal.entity.Role;
 import com.HLKPfinal.jwt.TokenProvider;
 //import com.HLKPfinal.repository.AuthorityRepository;
 import com.HLKPfinal.repository.MemberRepository;
 import com.HLKPfinal.repository.RefreshTokenRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-
-import java.util.HashSet;
 import java.util.Set;
 
 @Service
@@ -39,38 +35,70 @@ public class AuthService {
      * 회원가입
      */
     @Transactional
+//    public MemberResponseDto signup(MemberRequestDto memberRequestDto) {
+//        // 이메일 중복 회원 검증
+//        if (memberRepository.existsByEmail(memberRequestDto.getEmail())) {
+//            throw new RuntimeException("이미 가입되어 있는 이메일입니다.");
+//        }
+//
+//        Authority authority = authorityRepository
+//                .findByAuthorityStatus(AuthorityEnum.ROLE_USER).orElseThrow(()->new RuntimeException("권한 정보가 없습니다."));
+//
+//        Set<Authority> set = new HashSet<>();
+//        set.add(authority);
+//
+//        Member member = memberRequestDto.toMember(passwordEncoder, set);
+//        return MemberResponseDto.of(memberRepository.save(member));
+//    }
+
     public MemberResponseDto signup(MemberRequestDto memberRequestDto) {
-        // 이메일 중복 회원 검증
         if (memberRepository.existsByEmail(memberRequestDto.getEmail())) {
             throw new RuntimeException("이미 가입되어 있는 이메일입니다.");
         }
 
-//        Authority auth = authorityRepository
-//                .findByAuthorityStatus(AuthorityEnum.ROLE_USER).orElseThrow(()->new RuntimeException("권한 정보가 없습니다."));
-//
-//        Set<GrantedAuthority> set  = new HashSet<>();
-//        set.add(auth);
-
         Member member = memberRequestDto.toMember(passwordEncoder);
         return MemberResponseDto.of(memberRepository.save(member));
     }
+
+
     /**
      * 로그인
      */
     @Transactional
+//    public TokenDto login(MemberRequestDto memberRequestDto) {
+//        // Dto의 email, password를 받고 UsernamePasswordAuthenticationToken 객체 생성
+//        UsernamePasswordAuthenticationToken authenticationToken = memberRequestDto.toAuthentication();
+//
+//        // authenticate 메서드가 실행이 될 때 CustomUserDetailsService 에서 만들었던 loadUserByUsername 메서드가 실행됨
+//        Authentication authentication = authenticationManagerBuilder.getObject().authenticate(authenticationToken);
+//
+//        // JWT 토큰 생성
+//        TokenDto tokenDto = tokenProvider.generateTokenDto(authentication);
+//
+//        // refreshToken 저장
+//        RefreshToken refreshToken = RefreshToken.builder()
+//                .key(authentication.getName())
+//                .value(tokenDto.getRefreshToken())
+//                .build();
+//
+//        refreshTokenRepository.save(refreshToken);
+//
+//        return tokenDto;
+//    }
+
     public TokenDto login(MemberRequestDto memberRequestDto) {
-        // Dto의 email, password를 받고 UsernamePasswordAuthenticationToken 객체 생성
         UsernamePasswordAuthenticationToken authenticationToken = memberRequestDto.toAuthentication();
+        Member member = memberRepository.findByEmail(memberRequestDto.getEmail())
+                .orElseThrow(() -> new RuntimeException("가입되지 않은 이메일입니다."));
 
-        // authenticate 메서드가 실행이 될 때 CustomUserDetailsService 에서 만들었던 loadUserByUsername 메서드가 실행됨
-        Authentication authentication = authenticationManagerBuilder.getObject().authenticate(authenticationToken);
+        if (!passwordEncoder.matches(memberRequestDto.getPassword(), member.getPassword())) {
+            throw new RuntimeException("비밀번호가 일치하지 않습니다.");
+        }
 
-        // JWT 토큰 생성
-        TokenDto tokenDto = tokenProvider.generateTokenDto(authentication);
+        TokenDto tokenDto = tokenProvider.generateTokenDto(authenticationToken);
 
-        // refreshToken 저장
         RefreshToken refreshToken = RefreshToken.builder()
-                .key(authentication.getName())
+                .key(member.getEmail())
                 .value(tokenDto.getRefreshToken())
                 .build();
 
@@ -78,6 +106,8 @@ public class AuthService {
 
         return tokenDto;
     }
+
+
 
     /**
      * 재발급

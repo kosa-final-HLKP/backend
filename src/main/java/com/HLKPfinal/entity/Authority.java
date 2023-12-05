@@ -13,14 +13,14 @@
 //    @Id
 //    @Column(name = "authority_status")
 //    @Enumerated(EnumType.STRING)
-//    private AuthorityEnum authorityStatus;
+//    private Role authorityStatus;
 //
 //    public String getAuthorityStatus() {
 //        return this.authorityStatus.toString();
 //    }
 //
 //    @Builder
-//    public Authority(AuthorityEnum authorityStatus) {
+//    public Authority(Role authorityStatus) {
 //        this.authorityStatus = authorityStatus;
 //    }
 //}

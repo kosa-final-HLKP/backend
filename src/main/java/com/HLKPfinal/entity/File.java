@@ -7,10 +7,10 @@ import javax.persistence.*;
 @Getter
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Video {
+public class File {
 
     @Id @GeneratedValue
-    @Column(name = "video_id")
+    @Column(name = "diaryfile_id")
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -18,15 +18,15 @@ public class Video {
     private Member member;
 
     @Column(nullable = false)
-    private String origFileName;  // 파일 원본명
+    private String fileName;  // 파일 원본명
 
     @Column(nullable = false)
     private String filePath;  // 파일 저장 경로
 
     @Builder
-    public Video(Member member, String origFileName, String filePath) {
+    public File(Member member, String fileName, String filePath) {
         this.member = member;
-        this.origFileName = origFileName;
+        this.fileName = fileName;
         this.filePath = filePath;
     }
 }

@@ -1,10 +1,10 @@
 package com.HLKPfinal.repository;
 
-import com.HLKPfinal.entity.Video;
+import com.HLKPfinal.entity.File;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;
 
-public interface VideoRepository extends JpaRepository<Video, Long> {
-    Optional<Video> findByOrigFileName(String origFileName);
+public interface VideoRepository extends JpaRepository<File, Long> {
+    Optional<File> findByFileName(String fileName);
 }

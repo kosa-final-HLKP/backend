@@ -2,7 +2,7 @@ package com.HLKPfinal.controller;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import com.HLKPfinal.entity.Video;
+import com.HLKPfinal.entity.File;
 import com.HLKPfinal.dto.VideoListResponseDto;
 import com.HLKPfinal.dto.VideoListDto;
 import com.HLKPfinal.dto.VideoPlayRequestDto;
@@ -33,24 +33,11 @@ public class VideoController {
     @PostMapping("/upload")
     @PreAuthorize("hasRole('ROLE_USER')")
     public ResponseEntity<String> uploadVideo(MultipartFile file) throws IOException {
-        if (file == null) {
-            return new ResponseEntity<>("업로드할 파일이 전송되지 않았습니다.", HttpStatus.BAD_REQUEST);
-        }
-
-        if (file.isEmpty()) {
-            return new ResponseEntity<>("업로드할 파일이 비어있습니다.", HttpStatus.BAD_REQUEST);
-        }
-
         videoService.uploadVideo(file);
         return new ResponseEntity<>("업로드 성공", HttpStatus.OK);
     }
 
-//    public ResponseEntity<String> uploadVideo(MultipartFile file) throws IOException {
-//        videoService.uploadVideo(file);
-//        return new ResponseEntity<>("업로드 성공", HttpStatus.OK);
-//    }
-
-    @GetMapping("/play/{name}")
+    @GetMapping("/play")
     public ResponseEntity<ResourceRegion> playVideo
             (@RequestHeader HttpHeaders httpHeaders, @RequestBody VideoPlayRequestDto dto) throws IOException {
         return videoService.playVideo(httpHeaders, dto);
@@ -66,9 +53,9 @@ public class VideoController {
 
     @GetMapping("/list")
     public VideoListResponseDto findVideos() {
-        List<Video> videos = videoService.findVideos();
+        List<File> videos = videoService.findVideos();
         List<VideoListDto> collect = videos.stream()
-                .map(v -> new VideoListDto(v.getOrigFileName()))
+                .map(v -> new VideoListDto(v.getFileName()))
                 .collect(Collectors.toList());
 
         return new VideoListResponseDto(collect.size(), collect);

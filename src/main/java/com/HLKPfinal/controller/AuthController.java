@@ -6,10 +6,13 @@ import com.HLKPfinal.dto.TokenDto;
 import com.HLKPfinal.dto.TokenRequestDto;
 import com.HLKPfinal.service.AuthService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
+
+@Slf4j
 @RestController
 @RequestMapping("/auth")
 @RequiredArgsConstructor
@@ -18,13 +21,10 @@ public class AuthController {
 
     @PostMapping("/register")
     public ResponseEntity<MemberResponseDto> signup(@RequestBody MemberRequestDto memberRequestDto) {
+        log.info("Login request: email={}", memberRequestDto.getEmail());
         return ResponseEntity.ok(authService.signup(memberRequestDto));
     }
 
-//    @GetMapping("/admin")
-//    public String getUser(Authentication authentication){
-//        return "Admin Account"+authentication.getName();
-//    }
 
     @PostMapping("/login")
     public ResponseEntity<TokenDto> login(@RequestBody MemberRequestDto memberRequestDto) {

@@ -2,7 +2,6 @@ package com.HLKPfinal.config;
 
 import lombok.RequiredArgsConstructor;
 //import com.HLKPfinal.entity.Authority;
-import com.HLKPfinal.entity.Role;
 //import com.HLKPfinal.repository.AuthorityRepository;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;

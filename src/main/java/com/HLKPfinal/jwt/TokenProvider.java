@@ -1,5 +1,7 @@
 package com.HLKPfinal.jwt;
 
+import com.HLKPfinal.entity.Member;
+import com.HLKPfinal.repository.MemberRepository;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
@@ -12,6 +14,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Component;
 
 import java.security.Key;
@@ -34,6 +37,38 @@ public class TokenProvider {
         this.key = Keys.hmacShaKeyFor(keyBytes);
     }
 
+//    public TokenDto generateTokenDto(Authentication authentication) {
+//        // 권한들 가져오기
+//        String authorities = authentication.getAuthorities().stream()
+//                .map(GrantedAuthority::getAuthority)
+//                .collect(Collectors.joining(","));
+//
+//        long now = (new Date()).getTime();
+//
+//        // Access Token 생성
+//        Date accessTokenExpiresIn = new Date(now + ACCESS_TOKEN_EXPIRE_TIME);
+//        String accessToken = Jwts.builder()
+//                .setSubject(authentication.getName())       // payload "sub": "name"
+//                .claim(AUTHORITIES_KEY, authorities)        // payload "auth": "ROLE_USER"
+//                .setExpiration(accessTokenExpiresIn)        // payload "exp": 1516239022 (예시)
+//                .signWith(key, SignatureAlgorithm.HS512)    // header "alg": "HS512"
+//                .compact();
+//
+//        // Refresh Token 생성
+//        String refreshToken = Jwts.builder()
+//                .setExpiration(new Date(now + REFRESH_TOKEN_EXPIRE_TIME))
+//                .signWith(key, SignatureAlgorithm.HS512)
+//                .compact();
+//
+//        return TokenDto.builder()
+//                .grantType(BEARER_TYPE)
+//                .accessToken(accessToken)
+//                .accessTokenExpiresIn(accessTokenExpiresIn.getTime())
+//                .refreshToken(refreshToken)
+//                .build();
+//    }
+
+
     public TokenDto generateTokenDto(Authentication authentication) {
         // 권한들 가져오기
         String authorities = authentication.getAuthorities().stream()
@@ -46,7 +81,7 @@ public class TokenProvider {
         Date accessTokenExpiresIn = new Date(now + ACCESS_TOKEN_EXPIRE_TIME);
         String accessToken = Jwts.builder()
                 .setSubject(authentication.getName())       // payload "sub": "name"
-                .claim(AUTHORITIES_KEY, authorities)        // payload "auth": "ROLE_USER"
+                .claim(AUTHORITIES_KEY, authorities)        // payload "auth": "ROLE_USER,ROLE_ADMIN"
                 .setExpiration(accessTokenExpiresIn)        // payload "exp": 1516239022 (예시)
                 .signWith(key, SignatureAlgorithm.HS512)    // header "alg": "HS512"
                 .compact();
@@ -64,6 +99,9 @@ public class TokenProvider {
                 .refreshToken(refreshToken)
                 .build();
     }
+
+
+
 
     public Authentication getAuthentication(String accessToken) {
         // 토큰 복호화

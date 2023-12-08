@@ -1,26 +1,37 @@
-//package com.HLKPfinal.entity;
-//
-//import lombok.*;
-//
-//import javax.persistence.*;
-//
-//
-//@Entity
-//@Getter
-//@NoArgsConstructor(access = AccessLevel.PROTECTED)
-//public class Authority {
-//
+package com.HLKPfinal.entity;
+
+import lombok.*;
+
+import javax.persistence.*;
+import java.io.Serializable;
+
+
+@Entity
+@Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+public class Authority implements Serializable {
+
 //    @Id
 //    @Column(name = "authority_status")
-//    @Enumerated(EnumType.STRING)
-//    private Role authorityStatus;
-//
-//    public String getAuthorityStatus() {
-//        return this.authorityStatus.toString();
-//    }
-//
-//    @Builder
-//    public Authority(Role authorityStatus) {
-//        this.authorityStatus = authorityStatus;
-//    }
-//}
+////    @Enumerated(EnumType.STRING)
+//    private String authorityStatus;
+
+    @Id
+    @GeneratedValue
+    @Column(name = "authority_id")
+    private Long id;
+
+    @Column(name = "authority_status", unique = true)
+    private String authorityStatus;
+
+    public String getAuthorityStatus() {
+        return this.authorityStatus.toString();
+    }
+
+    @Builder
+    public Authority(String authorityStatus) {
+        this.authorityStatus = authorityStatus;
+    }
+
+
+}

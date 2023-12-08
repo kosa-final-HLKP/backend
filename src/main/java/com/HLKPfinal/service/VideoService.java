@@ -1,10 +1,10 @@
 package com.HLKPfinal.service;
 
 import com.HLKPfinal.dto.VideoPlayRequestDto;
-//import com.HLKPfinal.entity.Authority;
+import com.HLKPfinal.entity.Authority;
 import com.HLKPfinal.entity.File;
 import com.HLKPfinal.entity.Member;
-import com.HLKPfinal.entity.Role;
+//import com.HLKPfinal.entity.AuthorityEnum;
 import com.HLKPfinal.repository.MemberRepository;
 import com.HLKPfinal.repository.VideoRepository;
 import com.HLKPfinal.util.SecurityUtil;
@@ -24,9 +24,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
-import java.util.Collections;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -43,12 +41,47 @@ public class VideoService {
      * 비디오 업로드
      */
     @Transactional
+//    public void uploadVideo(MultipartFile multipartFile) throws IOException {
+//
+//        // 토큰에서 member 가져오기
+//        Member member = memberRepository
+//                .findById(SecurityUtil.getLoginMemberId())
+//                .orElseThrow(() -> new RuntimeException("로그인 유저 정보가 없습니다."));
+//
+//        // multipartFile 파일명 가져오기
+//        String videoName = multipartFile.getOriginalFilename();
+//
+//        // resources/videos 경로에 파일명 추가
+//        Path location = Paths.get(dir).resolve(videoName);
+//
+//        // 비디오 복사
+//        Files.copy(multipartFile.getInputStream(), location, StandardCopyOption.REPLACE_EXISTING);
+//
+//        // DB 저장
+//        File video = File.builder()
+//                .member(member)
+//                .fileName(videoName)
+//                .filePath(location.toString())
+//                .build();
+//
+//        videoRepository.save(video);
+//    }
+
     public void uploadVideo(MultipartFile multipartFile) throws IOException {
 
         // 토큰에서 member 가져오기
         Member member = memberRepository
                 .findById(SecurityUtil.getLoginMemberId())
                 .orElseThrow(() -> new RuntimeException("로그인 유저 정보가 없습니다."));
+
+        // 관리자 권한 확인
+        boolean isAdmin = member.getAuthorities().stream()
+                .map(Authority::getAuthorityStatus)
+                .anyMatch(a -> a.equals("ROLE_ADMIN"));
+
+        if (!isAdmin) {
+            throw new RuntimeException("관리자 권한이 없습니다.");
+        }
 
         // multipartFile 파일명 가져오기
         String videoName = multipartFile.getOriginalFilename();
@@ -68,6 +101,8 @@ public class VideoService {
 
         videoRepository.save(video);
     }
+
+
 
     /**
      * 비디오 재생
@@ -103,37 +138,36 @@ public class VideoService {
 //                .body(resourceRegion);
 //    }
 
-
     public ResponseEntity<ResourceRegion> playVideo(HttpHeaders httpHeaders, VideoPlayRequestDto dto) throws IOException {
+
         // 토큰에서 currentMemberId 가져오기
         Long currentMemberId = SecurityUtil.getLoginMemberId();
 
         // 파일명으로 uploader 찾기
-        Long uploader = videoRepository.findByFileName(dto.getFile())
-                .map(file -> file.getMember().getId())
-                .orElseThrow(() -> new RuntimeException("해당 비디오를 찾을 수 없습니다."));
+        Long uploader = videoRepository.findByFileName(dto.getFile()).get().getMember().getId();
 
         // currentMemberId로 권한 가져오기
-        Set<Role> roles = Collections.singleton(memberRepository.findById(currentMemberId)
-                .map(member -> member.getRole())
-                .orElseThrow(() -> new RuntimeException("로그인 유저 정보가 없습니다.")));
+        Set<Authority> authorities = memberRepository.findById(currentMemberId).get().getAuthorities();
 
         // admin 체크
-        boolean isAdmin = roles.equals(Role.ROLE_ADMIN);
+        boolean isAdmin = authorities.stream()
+                .map(Authority::getAuthorityStatus)
+                .anyMatch(a -> a.equals("ROLE_ADMIN"));
 
         // admin 권한이 없거나 업로더가 아니라면
-        if (!isAdmin && !currentMemberId.equals(uploader)) {
-            throw new RuntimeException("업로더가 아니거나 admin 권한이 없습니다.");
+        if (!isAdmin && currentMemberId != uploader) {
+            throw new RuntimeException("업로더가 아니거나 admin권한이 없습니다.");
         }
 
         // 비디오 재생
-        FileUrlResource resource = new FileUrlResource(dir + "//" + dto.getFile());
+        FileUrlResource resource = new FileUrlResource(dir + "//" +dto.getFile());
         ResourceRegion resourceRegion = resourceRegion(resource, httpHeaders);
 
         return ResponseEntity.status(HttpStatus.PARTIAL_CONTENT)
                 .contentType(MediaTypeFactory.getMediaType(resource).orElse(MediaType.APPLICATION_OCTET_STREAM))
                 .body(resourceRegion);
     }
+
 
     /**
      * 비디오 재생 테스트

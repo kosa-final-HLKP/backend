@@ -31,7 +31,7 @@ public class VideoController {
     private final VideoService videoService;
 
     @PostMapping("/upload")
-    @PreAuthorize("hasRole('ROLE_USER')")
+    @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
     public ResponseEntity<String> uploadVideo(MultipartFile file) throws IOException {
         videoService.uploadVideo(file);
         return new ResponseEntity<>("업로드 성공", HttpStatus.OK);
@@ -45,7 +45,7 @@ public class VideoController {
 
     // 크롬에서 테스트시 문제없음 postman에서는 처음으로 돌아감
     @GetMapping("/playTest/{name}")
-    @PreAuthorize("isAnonymous() or isAuthenticated()")
+    @PreAuthorize("isAnonymous() or hasAnyRole('USER', 'ADMIN')")
     public ResponseEntity<ResourceRegion> playVideoTest
     (@RequestHeader HttpHeaders httpHeaders, @PathVariable String name) throws IOException {
         return videoService.playVideoTest(httpHeaders, name);

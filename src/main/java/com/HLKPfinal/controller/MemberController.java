@@ -4,6 +4,7 @@ import com.HLKPfinal.dto.MemberResponseDto;
 import com.HLKPfinal.dto.MemberUpdateDto;
 import com.HLKPfinal.service.MemberService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -14,7 +15,8 @@ import javax.servlet.http.HttpServletRequest;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/member")
-@PreAuthorize("isAuthenticated()")
+//@PreAuthorize("isAuthenticated()")
+@PreAuthorize("hasAnyRole('USER', 'ADMIN')")
 public class MemberController {
 
     private final MemberService memberService;

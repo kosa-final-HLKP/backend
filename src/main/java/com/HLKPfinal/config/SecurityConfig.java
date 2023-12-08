@@ -94,14 +94,13 @@ public class SecurityConfig {
                 // /admin으로 시작하는 요청은 ADMIN 권한이 있는 유저에게만 허용
                 .antMatchers("/parent/**","/auth/admin/**").hasRole("ADMIN")
                 // /user 로 시작하는 요청은 USER 권한이 있는 유저에게만 허용
-                .antMatchers("/member/**","/video/**", "/attendance/**").hasRole("USER")
+                .antMatchers("/member/**","/video/**", "/attendance/**").hasAnyRole("USER","ADMIN")
                 .anyRequest().authenticated() // 나머지 요청들은 권한의 종류에 상관 없이 권한이 있어야 접근
 
 
                 .and()
                 // JWT 인증 필터 적용
                 .addFilterBefore(new JwtFilter(tokenProvider, redisTemplate), UsernamePasswordAuthenticationFilter.class)
-
 //                // 로그아웃 설정
 //                .logout()
 //                .logoutUrl("/logout") // 로그아웃 엔드포인트

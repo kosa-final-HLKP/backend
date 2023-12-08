@@ -23,19 +23,16 @@ public class Member {
     @Column(unique = true)
     private String email;
 
+    @Column
     private String name;
 
-
+    @Column
     private String password;
 
 
-    @Enumerated(EnumType.STRING)
-    private Role role;
+//    @Enumerated(EnumType.STRING)
+//    private AuthorityEnum role;
 
-    @ElementCollection(targetClass = Role.class, fetch = FetchType.EAGER)
-    @Enumerated(EnumType.STRING)
-    @CollectionTable(name = "member_roles", joinColumns = @JoinColumn(name = "member_id"))
-    private Set<Role> roles = new HashSet<>();
 
 
 //    @ManyToMany
@@ -44,23 +41,25 @@ public class Member {
 //            joinColumns = {@JoinColumn(name="member_id",referencedColumnName = "member_id")},
 //            inverseJoinColumns = {@JoinColumn(name = "authority_status",referencedColumnName = "authority_status")})
 //    private Set<Authority> authorities = new HashSet<>();
-//
-//    @Builder
-//    public Member(String email, String name, String password, Set<Authority> authorities) {
-//        this.email = email;
-//        this.name = name;
-//        this.password = password;
-//        this.authorities = authorities;
-//    }
+
+    @ManyToMany(cascade = CascadeType.ALL)
+    @JoinTable(
+            name = "member_authority",
+            joinColumns = {@JoinColumn(name = "member_id", referencedColumnName = "member_id")},
+            inverseJoinColumns = {@JoinColumn(name = "authority_status", referencedColumnName = "authority_status")})
+    private Set<Authority> authorities = new HashSet<>();
 
 
     @Builder
-    public Member(String email, String name, String password, Role role, Set<Role> roles) {
+    public Member(String email, String name, String password, Set<Authority> authorities) {
         this.email = email;
         this.name = name;
         this.password = password;
-        this.role = role;
-        this.roles = roles;
+        this.authorities = authorities;
+    }
+
+    public void setAuthorities(Set<Authority> authorities) {
+        this.authorities = authorities;
     }
 
     // 회원 정보 수정
@@ -68,4 +67,5 @@ public class Member {
         if(dto.getPassword() != null) this.password = passwordEncoder.encode(dto.getPassword());
         if(dto.getName() != null) this.name = dto.getName();
     }
+
 }

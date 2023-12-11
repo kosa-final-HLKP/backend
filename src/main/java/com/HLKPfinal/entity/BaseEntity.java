@@ -5,6 +5,7 @@ import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
+import javax.persistence.Column;
 import javax.persistence.EntityListeners;
 import javax.persistence.MappedSuperclass;
 import java.time.LocalDate;
@@ -16,25 +17,51 @@ import java.time.LocalDateTime;
 @EntityListeners(AuditingEntityListener.class)
 public abstract class BaseEntity {
 
+//    @CreatedDate
+//    private LocalDateTime createdDate;
+//
+//    @LastModifiedDate
+//    private LocalDateTime modifiedDate;
+//
+//    public LocalDateTime getCreatedDate() {
+//        return createdDate;
+//    }
+//
+//    public void setCreatedDate(LocalDateTime createdDate) {
+//        this.createdDate = createdDate;
+//    }
+//
+//    public LocalDateTime getModifiedDate() {
+//        return modifiedDate;
+//    }
+//
+//    public void setModifiedDate(LocalDateTime modifiedDate) {
+//        this.modifiedDate = modifiedDate;
+//    }
+
     @CreatedDate
-    private LocalDateTime createdDate;
+    @Column(name = "attendance")
+    private LocalDateTime attendance;
 
     @LastModifiedDate
-    private LocalDateTime modifiedDate;
+    @Column(name = "leave_time")
+    private LocalDateTime leaveTime;
 
-    public LocalDateTime getCreatedDate() {
-        return createdDate;
+    public LocalDateTime getAttendance() {
+        return attendance;
     }
 
-    public void setCreatedDate(LocalDateTime createdDate) {
-        this.createdDate = createdDate;
+    public void setAttendance(LocalDateTime attendance) {
+        this.attendance = attendance;
     }
 
-    public LocalDateTime getModifiedDate() {
-        return modifiedDate;
+    public LocalDateTime getLeaveTime() {
+        return leaveTime;
     }
 
-    public void setModifiedDate(LocalDateTime modifiedDate) {
-        this.modifiedDate = modifiedDate;
+    public void setLeaveTime(LocalDateTime leaveTime) {
+        this.leaveTime = leaveTime;
     }
+
+
 }

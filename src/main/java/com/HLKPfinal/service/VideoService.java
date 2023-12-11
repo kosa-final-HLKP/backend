@@ -67,8 +67,8 @@ public class VideoService {
 //        videoRepository.save(video);
 //    }
 
-    public void uploadVideo(MultipartFile multipartFile) throws IOException {
 
+    public String uploadVideo(MultipartFile multipartFile) throws IOException {
         // 토큰에서 member 가져오기
         Member member = memberRepository
                 .findById(SecurityUtil.getLoginMemberId())
@@ -92,14 +92,8 @@ public class VideoService {
         // 비디오 복사
         Files.copy(multipartFile.getInputStream(), location, StandardCopyOption.REPLACE_EXISTING);
 
-        // DB 저장
-        File video = File.builder()
-                .member(member)
-                .fileName(videoName)
-                .filePath(location.toString())
-                .build();
-
-        videoRepository.save(video);
+        // 파일 업로드 후에 파일의 경로를 반환
+        return location.toString();
     }
 
 

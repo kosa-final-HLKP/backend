@@ -1,32 +1,34 @@
 package com.HLKPfinal.config;
 
+
 import com.HLKPfinal.jwt.JwtAccessDeniedHandler;
 import com.HLKPfinal.jwt.JwtAuthenticationEntryPoint;
 import com.HLKPfinal.jwt.JwtFilter;
 import com.HLKPfinal.jwt.TokenProvider;
-import com.HLKPfinal.repository.MemberRepository;
 import com.HLKPfinal.service.CustomUserDetailsService;
-import com.HLKPfinal.service.MemberService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.http.HttpMethod;
+import org.springframework.security.access.AccessDecisionManager;
+import org.springframework.security.access.ConfigAttribute;
+import org.springframework.security.access.vote.AffirmativeBased;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.factory.PasswordEncoderFactories;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.access.expression.DefaultWebSecurityExpressionHandler;
+import org.springframework.security.web.access.expression.ExpressionBasedFilterInvocationSecurityMetadataSource;
+import org.springframework.security.web.access.expression.WebExpressionVoter;
+import org.springframework.security.web.access.intercept.FilterSecurityInterceptor;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
+import org.springframework.security.web.util.matcher.RequestMatcher;
 
+import java.util.*;
 
 
 @EnableWebSecurity
@@ -41,17 +43,6 @@ public class SecurityConfig {
     private final StringRedisTemplate redisTemplate;
     private final CustomUserDetailsService customUserDetailsService;
 
-
-    // UserDetailsService 설정
-//    @Bean
-//    public UserDetailsService userDetailsService() {
-//        UserDetails admin = User.builder()
-//                .username("orange@email.com")
-//                .password(passwordEncoder().encode("admin01234"))
-//                .roles("ADMIN")
-//                .build();
-//        return new InMemoryUserDetailsManager(admin);
-//    }
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -92,9 +83,9 @@ public class SecurityConfig {
                 .antMatchers("/auth/**").permitAll()
 //                .antMatchers("/register", "/login").permitAll()
                 // /admin으로 시작하는 요청은 ADMIN 권한이 있는 유저에게만 허용
-                .antMatchers("/parent/**","/auth/admin/**").hasRole("ADMIN")
+                .antMatchers("/parent/**","/auth/admin/**","/timeline/**","/diary/**","/video/**", "/baby/**").hasRole("ADMIN")
                 // /user 로 시작하는 요청은 USER 권한이 있는 유저에게만 허용
-                .antMatchers("/member/**","/video/**", "/attendance/**").hasAnyRole("USER","ADMIN")
+                .antMatchers("/member/**", "/attendance/**","/timeline/**").hasAnyRole("USER","ADMIN")
                 .anyRequest().authenticated() // 나머지 요청들은 권한의 종류에 상관 없이 권한이 있어야 접근
 
 
@@ -142,25 +133,14 @@ public class SecurityConfig {
                 .apply(new JwtSecurityConfig(tokenProvider, redisTemplate));
 
 
+
+
+
 //        http
 //                .authenticationProvider(daoAuthenticationProvider());
 
         return http.build();
     }
-
-
-//    @Bean
-//    public UserDetailsService userDetailsService() {
-//
-//        return new CustomUserDetailsService(memberRepository);
-//    }
-
-
-//    @Bean
-//    public PasswordEncoder passwordEncoder() {
-//
-//        return PasswordEncoderFactories.createDelegatingPasswordEncoder();
-//    }
 
 
     @Bean
@@ -170,31 +150,4 @@ public class SecurityConfig {
     }
 
 
-
-
-//    @Override
-//    protected void configure(HttpSecurity http) throws Exception {
-//        http
-//                // rest api, 로그인 폼 화면 disable
-//                .httpBasic().disable()
-//
-//                // rest api, CSRF 보안 disable
-//                .csrf().disable()
-//                .cors()
-//
-//                .and()
-//                // jwt token 인증, 세션 Stateless
-//                .sessionManagement()
-//                .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-//
-//                // exception handling
-//                .and()
-//                .exceptionHandling()
-//                .authenticationEntryPoint(jwtAuthenticationEntryPoint)
-//                .accessDeniedHandler(jwtAccessDeniedHandler)
-//
-//                // JwtFilter 를 addFilterBefore 로 등록했던 JwtSecurityConfig 클래스를 적용
-//                .and()
-//                .apply(new JwtSecurityConfig(tokenProvider, redisTemplate));
-//    }
 }

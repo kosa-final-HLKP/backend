@@ -51,13 +51,24 @@ public class VideoController {
         return videoService.playVideoTest(httpHeaders, name);
     }
 
+//    @GetMapping("/list")
+//    public VideoListResponseDto findVideos() {
+//        List<File> videos = videoService.findVideos();
+//        List<VideoListDto> collect = videos.stream()
+//                .map(v -> new VideoListDto(v.getFileName()))
+//                .collect(Collectors.toList());
+//
+//        return new VideoListResponseDto(collect.size(), collect);
+//    }
+
     @GetMapping("/list")
     public VideoListResponseDto findVideos() {
         List<File> videos = videoService.findVideos();
         List<VideoListDto> collect = videos.stream()
-                .map(v -> new VideoListDto(v.getFileName()))
+                .map(v -> new VideoListDto(v.getFileName(), v.getFilePath()))
                 .collect(Collectors.toList());
 
         return new VideoListResponseDto(collect.size(), collect);
     }
+
 }

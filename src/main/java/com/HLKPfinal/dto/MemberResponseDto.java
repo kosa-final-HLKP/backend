@@ -14,13 +14,19 @@ import java.util.Set;
 @NoArgsConstructor
 public class MemberResponseDto {
 
+    private Long memberId;  // 추가
 
     private String email;
     private String name;
     private Set<Authority> authorities;
 
+//    public static MemberResponseDto of(Member member) {
+//        return new MemberResponseDto(member.getEmail(), member.getName(), member.getAuthorities());
+//    }
+
     public static MemberResponseDto of(Member member) {
-        return new MemberResponseDto(member.getEmail(), member.getName(), member.getAuthorities());
+        return new MemberResponseDto(member.getId(), member.getEmail(), member.getName(), member.getAuthorities());
     }
+
 
 }

@@ -8,7 +8,9 @@ import lombok.NoArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @Getter
@@ -62,10 +64,22 @@ public class Member {
         this.authorities = authorities;
     }
 
+    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
+    private List<Baby> babies = new ArrayList<>();
+
     // 회원 정보 수정
     public void updateMember(MemberUpdateDto dto, PasswordEncoder passwordEncoder) {
         if(dto.getPassword() != null) this.password = passwordEncoder.encode(dto.getPassword());
         if(dto.getName() != null) this.name = dto.getName();
+    }
+
+    // 이메일 인증 메소드
+    public String verifyEmail(String email) {
+        if (this.email.equals(email)) {
+            return "인증 되었습니다.";
+        } else {
+            return "존재하지 않는 이메일입니다.";
+        }
     }
 
 }

@@ -33,6 +33,19 @@ public class AuthService {
     private final TokenProvider tokenProvider;
     private final RefreshTokenRepository refreshTokenRepository;
 
+
+    /**
+     * 이메일 인증
+     */
+    public String verifyEmail(String email) {
+        if (memberRepository.existsByEmail(email)) {
+            return "인증 되었습니다.";
+        } else {
+            return "존재하지 않는 이메일입니다.";
+        }
+    }
+
+
     /**
      * 회원가입
      */
@@ -72,6 +85,27 @@ public class AuthService {
      * 로그인
      */
     @Transactional
+//    public TokenDto login(MemberRequestDto memberRequestDto) {
+//        // Dto의 email, password를 받고 UsernamePasswordAuthenticationToken 객체 생성
+//        UsernamePasswordAuthenticationToken authenticationToken = memberRequestDto.toAuthentication();
+//
+//        // authenticate 메서드가 실행이 될 때 CustomUserDetailsService 에서 만들었던 loadUserByUsername 메서드가 실행됨
+//        Authentication authentication = authenticationManagerBuilder.getObject().authenticate(authenticationToken);
+//
+//        // JWT 토큰 생성
+//        TokenDto tokenDto = tokenProvider.generateTokenDto(authentication);
+//
+//        // refreshToken 저장
+//        RefreshToken refreshToken = RefreshToken.builder()
+//                .key(authentication.getName())
+//                .value(tokenDto.getRefreshToken())
+//                .build();
+//
+//        refreshTokenRepository.save(refreshToken);
+//
+//        return tokenDto;
+//    }
+
     public TokenDto login(MemberRequestDto memberRequestDto) {
         // Dto의 email, password를 받고 UsernamePasswordAuthenticationToken 객체 생성
         UsernamePasswordAuthenticationToken authenticationToken = memberRequestDto.toAuthentication();
@@ -79,8 +113,15 @@ public class AuthService {
         // authenticate 메서드가 실행이 될 때 CustomUserDetailsService 에서 만들었던 loadUserByUsername 메서드가 실행됨
         Authentication authentication = authenticationManagerBuilder.getObject().authenticate(authenticationToken);
 
+        // Member 객체 조회
+        Member member = memberRepository.findByEmail(memberRequestDto.getEmail())
+                .orElseThrow(() -> new RuntimeException("User not found with email: " + memberRequestDto.getEmail()));
+
         // JWT 토큰 생성
         TokenDto tokenDto = tokenProvider.generateTokenDto(authentication);
+
+        // memberId 설정
+        tokenDto.setMemberId(member.getId());
 
         // refreshToken 저장
         RefreshToken refreshToken = RefreshToken.builder()

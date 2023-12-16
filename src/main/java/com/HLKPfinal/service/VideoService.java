@@ -69,30 +69,22 @@ public class VideoService {
 
 
     public String uploadVideo(MultipartFile multipartFile) throws IOException {
-        // 토큰에서 member 가져오기
         Member member = memberRepository
                 .findById(SecurityUtil.getLoginMemberId())
                 .orElseThrow(() -> new RuntimeException("로그인 유저 정보가 없습니다."));
 
-        // 관리자 권한 확인
-        boolean isAdmin = member.getAuthorities().stream()
-                .map(Authority::getAuthorityStatus)
-                .anyMatch(a -> a.equals("ROLE_ADMIN"));
+        boolean isAdmin = member.getAuthority().getAuthorityStatus().equals("ROLE_ADMIN");
 
         if (!isAdmin) {
             throw new RuntimeException("관리자 권한이 없습니다.");
         }
 
-        // multipartFile 파일명 가져오기
         String videoName = multipartFile.getOriginalFilename();
 
-        // resources/videos 경로에 파일명 추가
         Path location = Paths.get(dir).resolve(videoName);
 
-        // 비디오 복사
         Files.copy(multipartFile.getInputStream(), location, StandardCopyOption.REPLACE_EXISTING);
 
-        // 파일 업로드 후에 파일의 경로를 반환
         return location.toString();
     }
 
@@ -134,26 +126,18 @@ public class VideoService {
 
     public ResponseEntity<ResourceRegion> playVideo(HttpHeaders httpHeaders, VideoPlayRequestDto dto) throws IOException {
 
-        // 토큰에서 currentMemberId 가져오기
         Long currentMemberId = SecurityUtil.getLoginMemberId();
 
-        // 파일명으로 uploader 찾기
         Long uploader = videoRepository.findByFileName(dto.getFile()).get().getMember().getId();
 
-        // currentMemberId로 권한 가져오기
-        Set<Authority> authorities = memberRepository.findById(currentMemberId).get().getAuthorities();
+        Authority authority = memberRepository.findById(currentMemberId).get().getAuthority();
 
-        // admin 체크
-        boolean isAdmin = authorities.stream()
-                .map(Authority::getAuthorityStatus)
-                .anyMatch(a -> a.equals("ROLE_ADMIN"));
+        boolean isAdmin = authority.getAuthorityStatus().equals("ROLE_ADMIN");
 
-        // admin 권한이 없거나 업로더가 아니라면
         if (!isAdmin && currentMemberId != uploader) {
             throw new RuntimeException("업로더가 아니거나 admin권한이 없습니다.");
         }
 
-        // 비디오 재생
         FileUrlResource resource = new FileUrlResource(dir + "//" +dto.getFile());
         ResourceRegion resourceRegion = resourceRegion(resource, httpHeaders);
 
@@ -196,7 +180,6 @@ public class VideoService {
     /**
      * 비디오 전체 조회
      */
-    @Transactional(readOnly = true)
     public List<File> findVideos() {
         return videoRepository.findAll();
     }

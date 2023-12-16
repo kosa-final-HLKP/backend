@@ -80,12 +80,12 @@ public class SecurityConfig {
                 // 조건별로 요청 허용/제한 설정
                 .authorizeRequests()
                 .antMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-                .antMatchers("/auth/**").permitAll()
+                .antMatchers("/auth/**", "/baby/**").permitAll()
 //                .antMatchers("/register", "/login").permitAll()
                 // /admin으로 시작하는 요청은 ADMIN 권한이 있는 유저에게만 허용
-                .antMatchers("/parent/**","/auth/admin/**","/timeline/**","/diary/**","/video/**", "/baby/**").hasRole("ADMIN")
+                .antMatchers("/parent/**","/auth/admin/**","/timeline/**","/diary/**","/video/**").hasRole("ADMIN")
                 // /user 로 시작하는 요청은 USER 권한이 있는 유저에게만 허용
-                .antMatchers("/member/**", "/attendance/**","/timeline/**").hasAnyRole("USER","ADMIN")
+                .antMatchers("/member/**", "/attendance/**","/timeline/**", "/timelines/**","/upload/**","/sendToken/**","/uploads/**").hasAnyRole("USER","ADMIN")
                 .anyRequest().authenticated() // 나머지 요청들은 권한의 종류에 상관 없이 권한이 있어야 접근
 
 

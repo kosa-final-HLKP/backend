@@ -31,41 +31,47 @@ public class Member {
     @Column
     private String password;
 
+    @ManyToOne
+    @JoinColumn(name = "authority_id")
+    private Authority authority;
+
 
 //    @Enumerated(EnumType.STRING)
 //    private AuthorityEnum role;
 
 
-
-//    @ManyToMany
+//
+//    @ManyToMany(cascade = CascadeType.ALL)
 //    @JoinTable(
 //            name = "member_authority",
-//            joinColumns = {@JoinColumn(name="member_id",referencedColumnName = "member_id")},
-//            inverseJoinColumns = {@JoinColumn(name = "authority_status",referencedColumnName = "authority_status")})
+//            joinColumns = {@JoinColumn(name = "member_id", referencedColumnName = "member_id")},
+//            inverseJoinColumns = {@JoinColumn(name = "authority_status", referencedColumnName = "authority_status")})
 //    private Set<Authority> authorities = new HashSet<>();
-
-    @ManyToMany(cascade = CascadeType.ALL)
-    @JoinTable(
-            name = "member_authority",
-            joinColumns = {@JoinColumn(name = "member_id", referencedColumnName = "member_id")},
-            inverseJoinColumns = {@JoinColumn(name = "authority_status", referencedColumnName = "authority_status")})
-    private Set<Authority> authorities = new HashSet<>();
 
 
     @Builder
-    public Member(String email, String name, String password, Set<Authority> authorities) {
+    public Member(String email, String name, String password, Authority authority) {
         this.email = email;
         this.name = name;
         this.password = password;
-        this.authorities = authorities;
+        this.authority = authority;
     }
 
-    public void setAuthorities(Set<Authority> authorities) {
-        this.authorities = authorities;
+    public void setAuthority(Authority authority) {
+        this.authority = authority;
     }
+
 
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
     private List<Baby> babies = new ArrayList<>();
+
+
+    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
+    private List<Ai> aiList = new ArrayList<>();
+
+    // 시터가 부모에게 인증을 받는 경우
+//    @OneToMany(mappedBy = "parent", cascade = CascadeType.ALL)
+//    private List<Member> sitters = new ArrayList<>();
 
     // 회원 정보 수정
     public void updateMember(MemberUpdateDto dto, PasswordEncoder passwordEncoder) {

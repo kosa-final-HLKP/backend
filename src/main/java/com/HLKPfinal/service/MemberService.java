@@ -25,6 +25,14 @@ public class MemberService {
     private final RefreshTokenRepository refreshTokenRepository;
     private final StringRedisTemplate redisTemplate;
 
+
+    // 멤버 ID로 멤버 객체 조회
+    @Transactional(readOnly = true)
+    public Member getMemberById(Long memberId) {
+        return memberRepository.findById(memberId)
+                .orElseThrow(() -> new IllegalArgumentException("Invalid member ID: " + memberId));
+    }
+
     /**
      * 내 정보 조회
      */

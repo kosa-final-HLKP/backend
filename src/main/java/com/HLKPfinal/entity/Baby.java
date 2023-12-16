@@ -16,11 +16,14 @@ public class Baby {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long babyId;
 
+    @Column
     private String name;
 
+    @Column
     private String birth;
 
     @Lob
+    @Column
     private String etc;
 
     @ManyToOne(fetch = FetchType.LAZY)

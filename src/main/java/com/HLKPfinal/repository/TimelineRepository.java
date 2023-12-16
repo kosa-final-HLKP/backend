@@ -9,4 +9,6 @@ import java.util.List;
 public interface TimelineRepository extends JpaRepository<Timeline, Long> {
     List<Timeline> findByMemberId(Long memberId);
     List<Timeline> findByMemberIdAndDate(Long memberId, Date date);
+    List<Timeline> findByDate(Date date);
 }
+

@@ -1,5 +1,6 @@
 package com.HLKPfinal.service;
 
+import com.HLKPfinal.dto.TimelineDto;
 import com.HLKPfinal.entity.Member;
 import com.HLKPfinal.entity.Timeline;
 import com.HLKPfinal.repository.MemberRepository;
@@ -8,6 +9,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class TimelineService {
@@ -28,4 +31,10 @@ public class TimelineService {
         timeline.setDate(new Date());
         return timelineRepository.save(timeline);
     }
+
+    public List<TimelineDto> getTimelinesByDate(Date date) {
+        List<Timeline> timelines = timelineRepository.findByDate(date);
+        return timelines.stream().map(Timeline::toDto).collect(Collectors.toList());
+    }
+
 }

@@ -3,23 +3,27 @@ package com.HLKPfinal.entity;
 import lombok.Getter;
 
 import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Getter
 public class Diary extends BaseEntity {
 
-    @Id @GeneratedValue
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY) // 수정됨
+    @Column(name="diary_id")
     private Long id;
 
-    @Column(nullable = false)
+    @Column(name="title", nullable = false)
     private String title;
 
     @Lob
-    @Column(nullable = false)
+    @Column(name="content",nullable = false)
     private String content;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "file_id")
+    @JoinColumn(name = "diaryfile_id")
     private File file;
 
     public Diary(String title, String content, File file) {

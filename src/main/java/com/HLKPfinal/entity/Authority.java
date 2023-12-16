@@ -24,14 +24,13 @@ public class Authority implements Serializable {
     @Column(name = "authority_status", unique = true)
     private String authorityStatus;
 
-    public String getAuthorityStatus() {
-        return this.authorityStatus.toString();
-    }
-
     @Builder
     public Authority(String authorityStatus) {
         this.authorityStatus = authorityStatus;
     }
 
+    public String getAuthorityStatus() {
+        return this.authorityStatus;
+    }
 
 }

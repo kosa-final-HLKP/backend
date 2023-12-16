@@ -30,6 +30,10 @@ public class Timeline extends BaseEntity {
     @JoinColumn(name = "member_id")
     private Member member;
 
+//    @ManyToOne(fetch = FetchType.LAZY)
+//    @JoinColumn(name = "diary_id")
+//    private Diary diary; // 'Diary' 엔티티와의 관계 정의
+
     @Column(name = "date")
     @Temporal(TemporalType.DATE)
     private Date date;
@@ -46,7 +50,7 @@ public class Timeline extends BaseEntity {
         dto.setMemberId(member.getId());
         dto.setContent(content);
         dto.setCategory(category);
-        dto.setRole(member.getAuthorities().iterator().next().getAuthorityStatus());
+        dto.setRole(member.getAuthority().getAuthorityStatus());
         dto.setDate(date);
         return dto;
     }

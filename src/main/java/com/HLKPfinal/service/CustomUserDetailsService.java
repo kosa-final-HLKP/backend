@@ -37,19 +37,15 @@ public class CustomUserDetailsService implements UserDetailsService {
 
     // DB 에 User 값이 존재한다면 UserDetails 객체로 만들어서 리턴
     private UserDetails createUserDetails(Member member) {
-        // Collections<? extends GrantedAuthority>
-        List<SimpleGrantedAuthority> authList = member.getAuthorities()
-                .stream()
-                .map(Authority::getAuthorityStatus)
-                .map(SimpleGrantedAuthority::new)
-                .collect(Collectors.toList());
+        Authority authority = member.getAuthority();
+        SimpleGrantedAuthority simpleGrantedAuthority = new SimpleGrantedAuthority(authority.getAuthorityStatus());
 
-        authList .forEach(o-> log.debug("authList -> {}",o.getAuthority()));
+        log.debug("authList -> {}", simpleGrantedAuthority.getAuthority());
 
         return new User(
                 String.valueOf(member.getId()),
                 member.getPassword(),
-                authList
+                Collections.singletonList(simpleGrantedAuthority)
         );
     }
 

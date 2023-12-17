@@ -13,17 +13,18 @@ import java.time.LocalDate;
 public class Baby {
 
     @Id
+    @Column(name="baby_id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long babyId;
+    private Long id;
 
-    @Column
+    @Column(name = "name")
     private String name;
 
-    @Column
+    @Column(name = "birth")
     private String birth;
 
     @Lob
-    @Column
+    @Column(name = "etc")
     private String etc;
 
     @ManyToOne(fetch = FetchType.LAZY)

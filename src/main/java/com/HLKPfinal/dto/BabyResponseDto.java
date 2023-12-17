@@ -13,7 +13,7 @@ public class BabyResponseDto {
 
     public static BabyResponseDto of(Baby baby) {
         BabyResponseDto dto = new BabyResponseDto();
-        dto.babyId = baby.getBabyId();
+        dto.babyId = baby.getId();
         dto.name = baby.getName();
         dto.birth = baby.getBirth();
         dto.etc = baby.getEtc();

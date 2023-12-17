@@ -1,5 +1,6 @@
 package com.HLKPfinal.controller;
 
+import com.HLKPfinal.dto.AiDto;
 import com.HLKPfinal.entity.Ai;
 import com.HLKPfinal.repository.MemberRepository;
 import com.HLKPfinal.service.AiService;
@@ -30,12 +31,20 @@ public class AiController {
     }
 
 
+//    @PostMapping("/sendToken")
+//    public ResponseEntity<String> sendToken(@RequestParam("member_id") Long memberId,
+//                                            @RequestHeader("Authorization") String token) {
+//        aiService.sendTokenToFlask(memberId, token);
+//        return ResponseEntity.ok("Token sent successfully");
+//    }
+
     @PostMapping("/sendToken")
-    public ResponseEntity<String> sendToken(@RequestParam("member_id") Long memberId,
-                                            @RequestHeader("Authorization") String token) {
-        aiService.sendTokenToFlask(memberId, token);
+    public ResponseEntity<String> sendToken(@RequestBody AiDto aiDto) {
+        aiService.sendTokenToFlask(aiDto.getMemberId(), aiDto.getToken());
         return ResponseEntity.ok("Token sent successfully");
     }
+
+
 
 //    @PostMapping("/upload")
 //    public ResponseEntity<String> upload(@RequestParam("image") MultipartFile image,

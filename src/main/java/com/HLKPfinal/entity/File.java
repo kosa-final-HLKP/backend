@@ -18,10 +18,10 @@ public class File extends BaseEntity{
     @JoinColumn(name = "member_id")
     private Member member;
 
-    @Column(nullable = false)
+    @Column(name ="file_name",nullable = false)
     private String fileName;  // 파일 원본명
 
-    @Column(nullable = false)
+    @Column(name = "file_path",nullable = false)
     private String filePath;  // 파일 저장 경로
 
     @Builder

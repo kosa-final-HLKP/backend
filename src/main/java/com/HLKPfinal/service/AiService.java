@@ -56,11 +56,17 @@ public class AiService {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
 
-        JSONObject requestBody = new JSONObject();
-        requestBody.put("member_id", memberId);
+//        JSONObject requestBody = new JSONObject();
+//        requestBody.put("member_id", memberId);
+//        requestBody.put("token", token);
+//
+//        HttpEntity<String> request = new HttpEntity<>(requestBody.toString(), headers);
+
+        Map<String, Object> requestBody = new HashMap<>();
+        requestBody.put("member_id", memberId.toString());
         requestBody.put("token", token);
 
-        HttpEntity<String> request = new HttpEntity<>(requestBody.toString(), headers);
+        HttpEntity<Map<String, Object>> request = new HttpEntity<>(requestBody, headers);
         restTemplate.postForObject(flaskUrl, request, String.class);
     }
 
@@ -107,7 +113,7 @@ public class AiService {
         return "Image saved successfully"; // 이미지가 성공적으로 저장됐음을 알림
     }
 
-    
+
 //    public List<byte[]> getImageData() {
 //        return aiRepository.findAllByOrderByCreatedAtDesc()
 //                .stream()

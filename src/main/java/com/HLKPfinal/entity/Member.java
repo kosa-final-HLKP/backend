@@ -22,13 +22,13 @@ public class Member {
     @Column(name = "member_id")
     private Long id;
 
-    @Column(unique = true)
+    @Column(name="email",unique = true)
     private String email;
 
-    @Column
+    @Column(name="name")
     private String name;
 
-    @Column
+    @Column(name="password")
     private String password;
 
     @ManyToOne

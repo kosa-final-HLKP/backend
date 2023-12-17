@@ -31,35 +31,42 @@ public class Member {
     @Column(name="password")
     private String password;
 
+//    @Column(name = "reference_email")
+//    private String referenceEmail; // 추가된 필드
+
+    @Column(name = "reference_email")
+    private String referenceEmail; // 수정된 필드
+
+
+//    @OneToOne(mappedBy = "referenceMember")
+//    private Member referencedBy; // 현재 Member 객체를 참조하는 다른 Member 객체
+
+
     @ManyToOne
     @JoinColumn(name = "authority_id")
     private Authority authority;
 
-
-//    @Enumerated(EnumType.STRING)
-//    private AuthorityEnum role;
-
-
-//
-//    @ManyToMany(cascade = CascadeType.ALL)
-//    @JoinTable(
-//            name = "member_authority",
-//            joinColumns = {@JoinColumn(name = "member_id", referencedColumnName = "member_id")},
-//            inverseJoinColumns = {@JoinColumn(name = "authority_status", referencedColumnName = "authority_status")})
-//    private Set<Authority> authorities = new HashSet<>();
-
-
     @Builder
-    public Member(String email, String name, String password, Authority authority) {
+    public Member(String email, String name, String password, Authority authority, String referenceEmail) {
         this.email = email;
         this.name = name;
         this.password = password;
         this.authority = authority;
+        this.referenceEmail = referenceEmail;
     }
 
     public void setAuthority(Authority authority) {
         this.authority = authority;
     }
+
+//    public void setReferenceMember(Member referenceMember) {
+//        this.referenceMember = referenceMember;
+//    }
+
+//    public Member getReferencedBy() {
+//        return this.referencedBy;
+//    }
+
 
 
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
@@ -69,9 +76,6 @@ public class Member {
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
     private List<Ai> aiList = new ArrayList<>();
 
-    // 시터가 부모에게 인증을 받는 경우
-//    @OneToMany(mappedBy = "parent", cascade = CascadeType.ALL)
-//    private List<Member> sitters = new ArrayList<>();
 
     // 회원 정보 수정
     public void updateMember(MemberUpdateDto dto, PasswordEncoder passwordEncoder) {
@@ -79,13 +83,5 @@ public class Member {
         if(dto.getName() != null) this.name = dto.getName();
     }
 
-    // 이메일 인증 메소드
-    public String verifyEmail(String email) {
-        if (this.email.equals(email)) {
-            return "인증 되었습니다.";
-        } else {
-            return "존재하지 않는 이메일입니다.";
-        }
-    }
 
 }

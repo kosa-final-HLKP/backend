@@ -11,11 +11,6 @@ import java.io.Serializable;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Authority implements Serializable {
 
-//    @Id
-//    @Column(name = "authority_status")
-////    @Enumerated(EnumType.STRING)
-//    private String authorityStatus;
-
     @Id
     @GeneratedValue
     @Column(name = "authority_id")

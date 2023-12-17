@@ -2,6 +2,7 @@ package com.HLKPfinal.dto;
 
 import com.HLKPfinal.entity.Member;
 
+import java.time.LocalDateTime;
 import java.util.Date;
 
 public class TimelineDto {
@@ -10,17 +11,24 @@ public class TimelineDto {
     private String role;
     private String content;
     private String category;
-    private Date date;
+//    private Date date;
+
+    private LocalDateTime dateTime;  // 수정된 부분
 
     public TimelineDto() {
     }
 
-    public TimelineDto(Long memberId, String role, String content, String category, Date date) {
+    public LocalDateTime getDateTime() {  // 수정된 부분
+        return dateTime;
+    }
+
+    public TimelineDto(Long memberId, String role, String content, String category, LocalDateTime dateTime) {
         this.memberId = memberId;
         this.role = role;
         this.content = content;
         this.category = category;
-        this.date = date;
+//        this.date = date;
+        this.dateTime = dateTime;  // 수정된 부분
     }
 
     // getter, setter...
@@ -57,12 +65,16 @@ public class TimelineDto {
         this.category = category;
     }
 
-    public Date getDate() {
-        return date;
+    public void setDateTime(LocalDateTime dateTime) {  // 수정된 부분
+        this.dateTime = dateTime;
     }
 
-    public void setDate(Date date) {
-        this.date = date;
-    }
+//    public Date getDate() {
+//        return date;
+//    }
+//
+//    public void setDate(Date date) {
+//        this.date = date;
+//    }
 
 }

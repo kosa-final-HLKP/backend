@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -50,10 +51,29 @@ public class AttendanceService {
         this.memberRepository = memberRepository;
     }
 
+//    public List<Attendance> getAllAttendanceRecords() {
+//        Long memberId = SecurityUtil.getLoginMemberId();
+//        return attendanceRepository.findByMemberId(memberId);
+//    }
+
     public List<Attendance> getAllAttendanceRecords() {
         Long memberId = SecurityUtil.getLoginMemberId();
-        return attendanceRepository.findByMemberId(memberId);
+        Member member = memberRepository.findById(memberId)
+                .orElseThrow(() -> new RuntimeException("Member not found with id: " + memberId));
+
+        List<Attendance> myAttendances = attendanceRepository.findByMemberId(memberId);
+        List<Attendance> referenceAttendances = new ArrayList<>();
+
+        if (member.getReferenceEmail() != null) {
+            Member reference = memberRepository.findByEmail(member.getReferenceEmail())
+                    .orElseThrow(() -> new RuntimeException("Reference member not found with email: " + member.getReferenceEmail()));
+            referenceAttendances = attendanceRepository.findByMemberId(reference.getId());
+        }
+
+        myAttendances.addAll(referenceAttendances);
+        return myAttendances;
     }
+
 
     public Attendance recordAttendance() {
         Long memberId = SecurityUtil.getLoginMemberId();

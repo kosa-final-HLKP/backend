@@ -1,9 +1,6 @@
 package com.HLKPfinal.service;
 
-import com.HLKPfinal.dto.MemberRequestDto;
-import com.HLKPfinal.dto.MemberResponseDto;
-import com.HLKPfinal.dto.TokenDto;
-import com.HLKPfinal.dto.TokenRequestDto;
+import com.HLKPfinal.dto.*;
 import com.HLKPfinal.entity.Authority;
 import com.HLKPfinal.entity.Member;
 import com.HLKPfinal.entity.RefreshToken;
@@ -34,52 +31,38 @@ public class AuthService {
     private final RefreshTokenRepository refreshTokenRepository;
 
 
-    /**
-     * 이메일 인증
-     */
-    public String verifyEmail(String email) {
-        if (memberRepository.existsByEmail(email)) {
-            return "인증 되었습니다.";
-        } else {
-            return "존재하지 않는 이메일입니다.";
-        }
-    }
-
 
     /**
      * 회원가입
      */
     @Transactional
+
 //    public MemberResponseDto signup(MemberRequestDto memberRequestDto) {
 //        // 이메일 중복 회원 검증
 //        if (memberRepository.existsByEmail(memberRequestDto.getEmail())) {
 //            throw new RuntimeException("이미 가입되어 있는 이메일입니다.");
 //        }
 //
-////        Authority authority = authorityRepository
-////                .findByAuthorityStatus(AuthorityEnum.ROLE_USER).orElseThrow(()->new RuntimeException("권한 정보가 없습니다."));
-//
-//        Authority authority = authorityRepository
-//                .findByAuthorityStatus("ROLE_USER").orElseThrow(() -> new RuntimeException("권한 정보가 없습니다."));
-//
-//        Set<Authority> set = new HashSet<>();
-//        set.add(authority);
-//
-//        Member member = memberRequestDto.toMember(passwordEncoder, set);
-//        return MemberResponseDto.of(memberRepository.save(member));
+//        // 회원 정보 저장
+//        return MemberResponseDto.of(memberRepository.save(memberRequestDto.toMember(passwordEncoder, authorityRepository)));
 //    }
 
     public MemberResponseDto signup(MemberRequestDto memberRequestDto) {
-        // 이메일 중복 회원 검증
         if (memberRepository.existsByEmail(memberRequestDto.getEmail())) {
             throw new RuntimeException("이미 가입되어 있는 이메일입니다.");
         }
 
-        Member member = memberRequestDto.toMember(passwordEncoder, authorityRepository); // Set authorities
+        // 참조 이메일이 존재하는지 검증
+        String referenceEmail = memberRequestDto.getReferenceEmail();
+        if (referenceEmail != null && !referenceEmail.isEmpty()) {
+            if (!memberRepository.existsByEmail(referenceEmail)) {
+                throw new RuntimeException("참조 이메일이 존재하지 않습니다.");
+            }
+        }
+
+        Member member = memberRequestDto.toMember(passwordEncoder, authorityRepository);
         return MemberResponseDto.of(memberRepository.save(member));
     }
-
-
 
     /**
      * 로그인
@@ -107,21 +90,15 @@ public class AuthService {
 //    }
 
     public TokenDto login(MemberRequestDto memberRequestDto) {
-        // Dto의 email, password를 받고 UsernamePasswordAuthenticationToken 객체 생성
         UsernamePasswordAuthenticationToken authenticationToken = memberRequestDto.toAuthentication();
-
-        // authenticate 메서드가 실행이 될 때 CustomUserDetailsService 에서 만들었던 loadUserByUsername 메서드가 실행됨
         Authentication authentication = authenticationManagerBuilder.getObject().authenticate(authenticationToken);
-
-        // Member 객체 조회
         Member member = memberRepository.findByEmail(memberRequestDto.getEmail())
                 .orElseThrow(() -> new RuntimeException("User not found with email: " + memberRequestDto.getEmail()));
 
-        // JWT 토큰 생성
         TokenDto tokenDto = tokenProvider.generateTokenDto(authentication);
-
-        // memberId 설정
         tokenDto.setMemberId(member.getId());
+        tokenDto.setReferenceEmail(member.getReferenceEmail()); // 수정된 부분
+
 
         // refreshToken 저장
         RefreshToken refreshToken = RefreshToken.builder()
@@ -132,6 +109,15 @@ public class AuthService {
         refreshTokenRepository.save(refreshToken);
 
         return tokenDto;
+
+    }
+
+
+    @Transactional
+    public void verifyReferenceEmail(String referenceEmail) {
+        if (!memberRepository.existsByEmail(referenceEmail)) {
+            throw new RuntimeException("참조 이메일이 존재하지 않습니다.");
+        }
     }
 
 

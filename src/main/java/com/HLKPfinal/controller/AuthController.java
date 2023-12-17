@@ -1,9 +1,6 @@
 package com.HLKPfinal.controller;
 
-import com.HLKPfinal.dto.MemberRequestDto;
-import com.HLKPfinal.dto.MemberResponseDto;
-import com.HLKPfinal.dto.TokenDto;
-import com.HLKPfinal.dto.TokenRequestDto;
+import com.HLKPfinal.dto.*;
 import com.HLKPfinal.entity.Member;
 import com.HLKPfinal.service.AuthService;
 import lombok.RequiredArgsConstructor;
@@ -20,22 +17,23 @@ import org.springframework.web.bind.annotation.*;
 public class AuthController {
     private final AuthService authService;
 
+//    @PostMapping("/register")
+//    public ResponseEntity<MemberResponseDto> signup(@RequestBody MemberRequestDto memberRequestDto) {
+//        log.info("Login request: email={}", memberRequestDto.getEmail());
+//        return ResponseEntity.ok(authService.signup(memberRequestDto));
+//    }
+
     @PostMapping("/register")
     public ResponseEntity<MemberResponseDto> signup(@RequestBody MemberRequestDto memberRequestDto) {
-        log.info("Login request: email={}", memberRequestDto.getEmail());
+        log.info("Register request: email={}", memberRequestDto.getEmail());
         return ResponseEntity.ok(authService.signup(memberRequestDto));
     }
 
     @PostMapping("/verifyEmail")
-    public ResponseEntity<String> verifyEmail(@RequestBody String email) {
-        return ResponseEntity.ok(authService.verifyEmail(email));
+    public ResponseEntity<String> verifyEmail(@RequestBody VerifyEmailRequestDto verifyEmailRequestDto) {
+        authService.verifyReferenceEmail(verifyEmailRequestDto.getEmail()); // 수정된 부분
+        return ResponseEntity.ok("이메일 인증이 완료되었습니다.");
     }
-
-
-//    @PostMapping("/login")
-//    public ResponseEntity<TokenDto> login(@RequestBody MemberRequestDto memberRequestDto) {
-//        return ResponseEntity.ok(authService.login(memberRequestDto));
-//    }
 
     @PostMapping("/login")  // 수정된 부분
     public ResponseEntity<TokenDto> login(@RequestBody MemberRequestDto memberRequestDto) {

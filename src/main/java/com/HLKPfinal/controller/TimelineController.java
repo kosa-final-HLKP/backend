@@ -9,6 +9,9 @@ import org.springframework.web.bind.annotation.*;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Date;
 import java.util.List;
 
@@ -29,11 +32,20 @@ public class TimelineController {
         return timeline.toDto();
     }
 
+//    @GetMapping("/timelines")
+//    public List<TimelineDto> getTimelinesByDate(@RequestParam String date) throws ParseException {
+//        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+//        Date parsedDate = formatter.parse(date);
+//        return timelineService.getTimelinesByDate(parsedDate);
+//    }
+
     @GetMapping("/timelines")
-    public List<TimelineDto> getTimelinesByDate(@RequestParam String date) throws ParseException {
-        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
-        Date parsedDate = formatter.parse(date);
-        return timelineService.getTimelinesByDate(parsedDate);
+    public List<TimelineDto> getTimelinesByDate(@RequestParam String dateTime) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        LocalDateTime startDateTime = LocalDate.parse(dateTime, formatter).atStartOfDay();  // 해당 날짜의 시작 시간
+        LocalDateTime endDateTime = LocalDate.parse(dateTime, formatter).plusDays(1).atStartOfDay();  // 해당 날짜의 다음 날 시작 시간
+        return timelineService.getTimelinesByDateTimeRange(startDateTime, endDateTime);  // 해당 날짜 범위에 있는 타임라인을 가져옵니다.
     }
+
 
 }

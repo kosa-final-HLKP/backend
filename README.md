@@ -20,6 +20,8 @@ https://pamyferret.tistory.com/9 (설치 참고 글)
 -spring.datasource.url=jdbc:mysql://localhost:3306/주소입력
 
 
+.
+
 - AI_BACK 연동 Flask 연동 코드 깃에 추가로 업로드 예정
 
 - git push가 되지 않는 상황이여서 우선 공유 드라이브에 AI - BACK 연동 코드도 같이 첨부해두었습니다.
